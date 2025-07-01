@@ -1,3 +1,4 @@
+// usecases/contact.usecase.ts
 import { ContactRepository } from "../repositories/contact.repository";
 
 export class IdentifyUsecase {
@@ -25,35 +26,31 @@ export class IdentifyUsecase {
     for (const contact of existing) {
       if (
         contact.linkPrecedence === "primary" &&
-        contact.createdAt < primary.createdAt
+        new Date(contact.createdAt) < new Date(primary.createdAt)
       ) {
         primary = contact;
       }
     }
 
     for (const contact of existing) {
-      if (
-        contact._id.toString() !== primary._id.toString() &&
-        contact.linkPrecedence === "primary"
-      ) {
+      const isSameAsPrimary = contact._id.toString() === primary._id.toString();
+      if (!isSameAsPrimary && contact.linkPrecedence === "primary") {
         await this.contactRepo.update(contact._id.toString(), {
           linkPrecedence: "secondary",
+          linkedId: primary._id,
+        });
+      } else if (!isSameAsPrimary && contact.linkedId?.toString() !== primary._id.toString()) {
+        await this.contactRepo.update(contact._id.toString(), {
           linkedId: primary._id,
         });
       }
     }
 
-    const allLinked = await this.contactRepo.findAllLinked(primary._id.toString());
+    let allLinked = await this.contactRepo.findAllLinked(primary._id.toString());
 
-    const emails = Array.from(new Set(allLinked.map((c) => c.email).filter(Boolean)));
-    const phones = Array.from(new Set(allLinked.map((c) => c.phoneNumber).filter(Boolean)));
-    const secondaryIds = allLinked
-      .filter((c) => c.linkPrecedence === "secondary")
-      .map((c) => c._id);
-
-    const existsExact = existing.some(
-      (c) => c.email === email && c.phoneNumber === phoneNumber
-    );
+    const existsExact = allLinked.some((c) => {
+      return c.email === email && c.phoneNumber === phoneNumber;
+    });
 
     if (!existsExact) {
       await this.contactRepo.create({
@@ -62,7 +59,15 @@ export class IdentifyUsecase {
         linkPrecedence: "secondary",
         linkedId: primary._id,
       });
+
+      allLinked = await this.contactRepo.findAllLinked(primary._id.toString());
     }
+
+    const emails = Array.from(new Set(allLinked.map((c) => c.email).filter(Boolean)));
+    const phones = Array.from(new Set(allLinked.map((c) => c.phoneNumber).filter(Boolean)));
+    const secondaryIds = allLinked
+      .filter((c) => c.linkPrecedence === "secondary")
+      .map((c) => c._id);
 
     return {
       primaryContatctId: primary._id,
