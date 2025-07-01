@@ -1,9 +1,23 @@
-// usecases/contact.usecase.ts
 import { ContactRepository } from "../repositories/contact.repository";
 
+/**
+ * Use case for identifying and consolidating contact information based on email or phone number.
+ * @class
+ */
 export class IdentifyUsecase {
+  /**
+   * Creates an instance of IdentifyUsecase.
+   * @param contactRepo - The repository instance for contact-related database operations.
+   */
   constructor(private contactRepo: ContactRepository) {}
 
+  /**
+   * Identifies a contact by email and/or phone number, consolidating matching contacts.
+   * Creates a new contact if no matches are found, or links existing contacts to a primary contact.
+   * @param email - The email address to search for (optional).
+   * @param phoneNumber - The phone number to search for (optional).
+   * @returns A promise resolving to an object containing the primary contact ID, unique emails, phone numbers, and secondary contact IDs.
+   */
   async execute(email?: string, phoneNumber?: string) {
     const existing = await this.contactRepo.findMatching(email, phoneNumber);
 
@@ -16,8 +30,8 @@ export class IdentifyUsecase {
 
       return {
         primaryContatctId: newContact._id,
-        emails: [email],
-        phoneNumbers: [phoneNumber],
+        emails: [email].filter(Boolean),
+        phoneNumbers: [phoneNumber].filter(Boolean),
         secondaryContactIds: [],
       };
     }
