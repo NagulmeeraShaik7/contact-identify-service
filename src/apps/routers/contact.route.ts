@@ -6,7 +6,7 @@ const controller = new IdentifyController();
 
 /**
  * @swagger
- * /identify:
+ * /api/identify:
  *   post:
  *     summary: Identify a contact by email or phone number
  *     description: Identifies a contact based on provided email and/or phone number, consolidating contact information if matches are found.
