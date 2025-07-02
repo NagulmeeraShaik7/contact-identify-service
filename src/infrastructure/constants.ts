@@ -179,3 +179,18 @@ export const APP_CONSTANTS = {
   },
 };
 
+/**
+ * Constants for the Contact Identify Service
+ * @constant
+ * @type {Object}
+ * @property {string} IDENTIFY_PATH - The API path for identifying contacts.
+ * @description This module defines constants used throughout the contact identify service, including API paths, schema properties, example values, and error messages.
+ * 
+ */
+
+export const CONSTANTS = {
+  // API paths
+  IDENTIFY_PATH: "/identify",
+
+};
+
