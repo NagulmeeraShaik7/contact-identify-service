@@ -57,6 +57,8 @@ export const DEFAULTS = {
 export const SWAGGER_CONSTANTS = {
   OPENAPI_VERSION: "3.0.0",
   LOCALHOST: "http://localhost",
+  PRODUCTION_URL: "https://contact-identify-service.onrender.com",
+PRODUCTION_DESCRIPTION: "Production server for Contact Identification API",
   DEFAULT_PORT: "3000",
   SERVER_DESCRIPTION: "Local development server",
   API_DOCS_PATH: "/api-docs",
