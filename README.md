@@ -92,11 +92,13 @@ MONGO_URI=mongodb+srv://sshaiknagulmeera9:********@cluster0.krharly.mongodb.net/
 npm start
 ```
 
+
+
 ### 📑 4. Open Swagger Docs
 
-```bash
-http://localhost:3000/api-docs
-```
+- **Local**: `http://localhost:3000/api-docs`
+- **Production**: `https://contact-identify-service.onrender.com/api-docs`
+
 
 ---
 

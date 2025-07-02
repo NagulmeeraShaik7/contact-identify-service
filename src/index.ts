@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 import identifyRouter from "./apps/routers/contact.route";
 import errorMiddleware from "./middlewares/error.middleware";
 import { setupSwagger, swaggerSpec } from "./infrastructure/swaggerConfig";
@@ -15,6 +16,11 @@ dotenv.config();
  * The main Express application instance.
  */
 const app = express();
+
+/**
+ * Enables CORS for all origins.
+ */
+app.use(cors());
 
 /**
  * Middleware to parse incoming JSON request bodies.
