@@ -1,83 +1,84 @@
 import swaggerJSDoc from "swagger-jsdoc";
 import { Express } from "express";
+import { SWAGGER_CONSTANTS } from "../infrastructure/constants";
 
 /**
  * Swagger configuration options for generating the OpenAPI specification.
  */
 const swaggerOptions: swaggerJSDoc.Options = {
   definition: {
-    openapi: "3.0.0",
+    openapi: SWAGGER_CONSTANTS.OPENAPI_VERSION,
     info: {
-      title: "Contact Identification API",
-      version: "1.0.0",
-      description: "API for identifying and consolidating contact information based on email or phone number.",
+      title: SWAGGER_CONSTANTS.INFO.TITLE,
+      version: SWAGGER_CONSTANTS.INFO.VERSION,
+      description: SWAGGER_CONSTANTS.INFO.DESCRIPTION,
     },
     servers: [
       {
-        url: `http://localhost:${process.env.PORT || "3000"}`,
-        description: "Local development server",
+        url: `${SWAGGER_CONSTANTS.LOCALHOST}:${process.env.PORT || SWAGGER_CONSTANTS.DEFAULT_PORT}`,
+        description: SWAGGER_CONSTANTS.SERVER_DESCRIPTION,
       },
     ],
     components: {
       schemas: {
-        Contact: {
-          type: "object",
+        [SWAGGER_CONSTANTS.SCHEMA_NAME]: {
+          type: SWAGGER_CONSTANTS.SCHEMA_TYPE,
           properties: {
-            _id: {
-              type: "string",
-              description: "The unique identifier for the contact.",
-              example: "60f7b3b7c8e3b1234567890a",
+            [SWAGGER_CONSTANTS.PROPS.ID]: {
+              type: SWAGGER_CONSTANTS.TYPES.STRING,
+              description: SWAGGER_CONSTANTS.DESCRIPTIONS.ID,
+              example: SWAGGER_CONSTANTS.EXAMPLES.ID,
             },
-            phoneNumber: {
-              type: "string",
-              description: "The phone number of the contact (optional).",
-              example: "1234567890",
+            [SWAGGER_CONSTANTS.PROPS.PHONE]: {
+              type: SWAGGER_CONSTANTS.TYPES.STRING,
+              description: SWAGGER_CONSTANTS.DESCRIPTIONS.PHONE,
+              example: SWAGGER_CONSTANTS.EXAMPLES.PHONE,
               nullable: true,
             },
-            email: {
-              type: "string",
-              description: "The email address of the contact (optional).",
-              example: "example@domain.com",
+            [SWAGGER_CONSTANTS.PROPS.EMAIL]: {
+              type: SWAGGER_CONSTANTS.TYPES.STRING,
+              description: SWAGGER_CONSTANTS.DESCRIPTIONS.EMAIL,
+              example: SWAGGER_CONSTANTS.EXAMPLES.EMAIL,
               nullable: true,
             },
-            linkedId: {
-              type: "string",
-              description: "The ID of the primary contact this contact is linked to (null if primary).",
-              example: "60f7b3b7c8e3b1234567890b",
+            [SWAGGER_CONSTANTS.PROPS.LINKED_ID]: {
+              type: SWAGGER_CONSTANTS.TYPES.STRING,
+              description: SWAGGER_CONSTANTS.DESCRIPTIONS.LINKED_ID,
+              example: SWAGGER_CONSTANTS.EXAMPLES.LINKED_ID,
               nullable: true,
             },
-            linkPrecedence: {
-              type: "string",
-              enum: ["primary", "secondary"],
-              description: "Indicates whether the contact is primary or secondary.",
-              example: "primary",
+            [SWAGGER_CONSTANTS.PROPS.LINK_PRECEDENCE]: {
+              type: SWAGGER_CONSTANTS.TYPES.STRING,
+              enum: SWAGGER_CONSTANTS.LINK_PRECEDENCE_ENUM,
+              description: SWAGGER_CONSTANTS.DESCRIPTIONS.LINK_PRECEDENCE,
+              example: SWAGGER_CONSTANTS.EXAMPLES.LINK_PRECEDENCE,
             },
-            deletedAt: {
-              type: "string",
-              format: "date-time",
-              description: "The date and time when the contact was soft-deleted (null if not deleted).",
-              example: "2025-07-01T17:43:00.000Z",
+            [SWAGGER_CONSTANTS.PROPS.DELETED_AT]: {
+              type: SWAGGER_CONSTANTS.TYPES.STRING,
+              format: SWAGGER_CONSTANTS.FORMATS.DATE_TIME,
+              description: SWAGGER_CONSTANTS.DESCRIPTIONS.DELETED_AT,
+              example: SWAGGER_CONSTANTS.EXAMPLES.DELETED_AT,
               nullable: true,
             },
-            createdAt: {
-              type: "string",
-              format: "date-time",
-              description: "The date and time when the contact was created.",
-              example: "2025-07-01T17:43:00.000Z",
+            [SWAGGER_CONSTANTS.PROPS.CREATED_AT]: {
+              type: SWAGGER_CONSTANTS.TYPES.STRING,
+              format: SWAGGER_CONSTANTS.FORMATS.DATE_TIME,
+              description: SWAGGER_CONSTANTS.DESCRIPTIONS.CREATED_AT,
+              example: SWAGGER_CONSTANTS.EXAMPLES.CREATED_AT,
             },
-            updatedAt: {
-              type: "string",
-              format: "date-time",
-              description: "The date and time when the contact was last updated.",
-              example: "2025-07-01T17:43:00.000Z",
+            [SWAGGER_CONSTANTS.PROPS.UPDATED_AT]: {
+              type: SWAGGER_CONSTANTS.TYPES.STRING,
+              format: SWAGGER_CONSTANTS.FORMATS.DATE_TIME,
+              description: SWAGGER_CONSTANTS.DESCRIPTIONS.UPDATED_AT,
+              example: SWAGGER_CONSTANTS.EXAMPLES.UPDATED_AT,
             },
           },
-          required: ["linkPrecedence"],
+          required: [SWAGGER_CONSTANTS.PROPS.LINK_PRECEDENCE],
         },
       },
     },
   },
-  apis: ["./src/apps/routers/*.ts"], // Path to files containing Swagger JSDoc comments
+  apis: [SWAGGER_CONSTANTS.API_GLOBS],
 };
 
 /**
@@ -91,7 +92,7 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
  */
 export function setupSwagger(app: Express): void {
   const swaggerUi = require("swagger-ui-express");
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use(SWAGGER_CONSTANTS.API_DOCS_PATH, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
 
 export { swaggerSpec };

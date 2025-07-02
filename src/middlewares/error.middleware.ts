@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { ERROR_CONSTANTS } from "../infrastructure/constants";
 
 /**
  * Middleware to handle errors in the Express application.
@@ -16,5 +17,7 @@ export default function errorMiddleware(
   _next: NextFunction
 ) {
   console.error(err);
-  res.status(500).json({ error: "Internal Server Error" });
+  res.status(ERROR_CONSTANTS.STATUS_CODE).json({
+    [ERROR_CONSTANTS.RESPONSE_FIELD]: ERROR_CONSTANTS.MESSAGE,
+  });
 }

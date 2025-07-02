@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import identifyRouter from "./apps/routers/contact.route";
 import errorMiddleware from "./middlewares/error.middleware";
 import { setupSwagger, swaggerSpec } from "./infrastructure/swaggerConfig";
+import { APP_CONSTANTS } from "./infrastructure/constants";
 
 /**
  * Initializes environment variables from the .env file.
@@ -12,7 +13,6 @@ dotenv.config();
 
 /**
  * The main Express application instance.
- * @type {express.Express}
  */
 const app = express();
 
@@ -22,55 +22,50 @@ const app = express();
 app.use(express.json());
 
 /**
- * Mounts the contact identification router under the /api prefix.
+ * Mounts the contact identification router.
  */
-app.use("/api", identifyRouter);
+app.use(APP_CONSTANTS.ROUTES.API_PREFIX, identifyRouter);
 
 /**
- * Sets up Swagger UI for API documentation and serves the raw Swagger specification.
+ * Sets up Swagger UI for API documentation.
  */
 setupSwagger(app);
 
 /**
- * Serves the raw Swagger specification JSON at /api-docs/json.
+ * Serves the raw Swagger specification JSON.
  */
-app.get("/api-docs/json", (_req: express.Request, res: express.Response) => {
-  res.status(200).json(swaggerSpec);
+app.get(APP_CONSTANTS.ROUTES.SWAGGER_JSON, (_req, res) => {
+  res.status(APP_CONSTANTS.HTTP_STATUS.OK).json(swaggerSpec);
 });
 
 /**
- * Mounts the error-handling middleware to catch and process errors.
+ * Mounts the error-handling middleware.
  */
 app.use(errorMiddleware);
 
 /**
- * MongoDB connection URI retrieved from environment variables.
- * @type {string | undefined}
+ * Retrieves MongoDB URI from environment variables.
  */
-const mongoUri = process.env.MONGO_URI;
+const mongoUri = process.env[APP_CONSTANTS.ENV.MONGO_URI_KEY];
 
 /**
- * Validates the MongoDB URI and throws an error if not defined.
+ * Throws error if Mongo URI is missing.
  */
 if (!mongoUri) {
-  throw new Error("MONGO_URI environment variable is not defined");
+  throw new Error(APP_CONSTANTS.ERROR_MESSAGES.MONGO_URI_NOT_DEFINED);
 }
 
 /**
- * Connects to MongoDB and starts the Express server.
- * Logs connection status and server startup details.
+ * Connects to MongoDB and starts the server.
  */
 mongoose
   .connect(mongoUri)
   .then(() => {
-    console.log("MongoDB connected");
-    /**
-     * Starts the Express server on the specified port.
-     * @type {string | undefined}
-     */
-    const port = process.env.PORT || "3000";
+    console.log(APP_CONSTANTS.LOGS.MONGO_CONNECTED);
+
+    const port = process.env[APP_CONSTANTS.ENV.PORT_KEY] || APP_CONSTANTS.DEFAULTS.PORT;
     app.listen(port, () =>
-      console.log(`Server running at http://localhost:${port}`)
+      console.log(`${APP_CONSTANTS.LOGS.SERVER_RUNNING_AT} ${APP_CONSTANTS.URL.HOST}:${port}`)
     );
   })
-  .catch((err) => console.error("MongoDB connection failed", err));
+  .catch((err) => console.error(APP_CONSTANTS.LOGS.MONGO_CONNECTION_FAILED, err));

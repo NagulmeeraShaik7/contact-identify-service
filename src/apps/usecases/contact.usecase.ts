@@ -1,4 +1,5 @@
 import { ContactRepository } from "../repositories/contact.repository";
+import { LINK_PRECEDENCE } from "../../infrastructure/constants";
 
 /**
  * Use case for identifying and consolidating contact information based on email or phone number.
@@ -25,7 +26,7 @@ export class IdentifyUsecase {
       const newContact = await this.contactRepo.create({
         email,
         phoneNumber,
-        linkPrecedence: "primary",
+        linkPrecedence: LINK_PRECEDENCE.PRIMARY,
       });
 
       return {
@@ -36,10 +37,12 @@ export class IdentifyUsecase {
       };
     }
 
-    let primary = existing.find((c) => c.linkPrecedence === "primary") || existing[0];
+    let primary =
+      existing.find((c) => c.linkPrecedence === LINK_PRECEDENCE.PRIMARY) || existing[0];
+
     for (const contact of existing) {
       if (
-        contact.linkPrecedence === "primary" &&
+        contact.linkPrecedence === LINK_PRECEDENCE.PRIMARY &&
         new Date(contact.createdAt) < new Date(primary.createdAt)
       ) {
         primary = contact;
@@ -48,12 +51,16 @@ export class IdentifyUsecase {
 
     for (const contact of existing) {
       const isSameAsPrimary = contact._id.toString() === primary._id.toString();
-      if (!isSameAsPrimary && contact.linkPrecedence === "primary") {
+
+      if (!isSameAsPrimary && contact.linkPrecedence === LINK_PRECEDENCE.PRIMARY) {
         await this.contactRepo.update(contact._id.toString(), {
-          linkPrecedence: "secondary",
+          linkPrecedence: LINK_PRECEDENCE.SECONDARY,
           linkedId: primary._id,
         });
-      } else if (!isSameAsPrimary && contact.linkedId?.toString() !== primary._id.toString()) {
+      } else if (
+        !isSameAsPrimary &&
+        contact.linkedId?.toString() !== primary._id.toString()
+      ) {
         await this.contactRepo.update(contact._id.toString(), {
           linkedId: primary._id,
         });
@@ -62,7 +69,7 @@ export class IdentifyUsecase {
 
     let allLinked = await this.contactRepo.findAllLinked(primary._id.toString());
 
-    const existsExact = allLinked.some((c) => {
+     const existsExact = allLinked.some((c) => {
       return c.email === email && c.phoneNumber === phoneNumber;
     });
 
@@ -70,17 +77,21 @@ export class IdentifyUsecase {
       await this.contactRepo.create({
         email,
         phoneNumber,
-        linkPrecedence: "secondary",
+        linkPrecedence: LINK_PRECEDENCE.SECONDARY,
         linkedId: primary._id,
       });
 
       allLinked = await this.contactRepo.findAllLinked(primary._id.toString());
     }
 
-    const emails = Array.from(new Set(allLinked.map((c) => c.email).filter(Boolean)));
-    const phones = Array.from(new Set(allLinked.map((c) => c.phoneNumber).filter(Boolean)));
+    const emails = Array.from(
+      new Set(allLinked.map((c) => c.email).filter(Boolean))
+    );
+    const phones = Array.from(
+      new Set(allLinked.map((c) => c.phoneNumber).filter(Boolean))
+    );
     const secondaryIds = allLinked
-      .filter((c) => c.linkPrecedence === "secondary")
+      .filter((c) => c.linkPrecedence === LINK_PRECEDENCE.SECONDARY)
       .map((c) => c._id);
 
     return {

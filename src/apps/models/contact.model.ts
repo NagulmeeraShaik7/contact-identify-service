@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { CONTACT_MODEL_NAME, LINK_PRECEDENCE, DEFAULTS } from "../../infrastructure/constants";
 
 const contactSchema = new mongoose.Schema(
   {
@@ -7,12 +8,12 @@ const contactSchema = new mongoose.Schema(
     linkedId: { type: mongoose.Schema.Types.ObjectId, default: null },
     linkPrecedence: {
       type: String,
-      enum: ["primary", "secondary"],
+      enum: [LINK_PRECEDENCE.PRIMARY, LINK_PRECEDENCE.SECONDARY],
       required: true,
     },
-    deletedAt: { type: Date, default: null },
+    deletedAt: { type: Date, default: DEFAULTS.DELETED_AT },
   },
   { timestamps: true }
 );
 
-export const ContactModel = mongoose.model("Contact", contactSchema);
+export const ContactModel = mongoose.model(CONTACT_MODEL_NAME, contactSchema);
