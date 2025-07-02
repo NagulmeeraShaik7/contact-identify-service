@@ -109,8 +109,8 @@ npm start
 ```json
 POST /api/identify
 {
-  "email": "example@domain.com",     // optional
-  "phoneNumber": "1234567890"        // optional
+  "email": "example@domain.com",     
+  "phoneNumber": "1234567890"        
 }
 ```
 
