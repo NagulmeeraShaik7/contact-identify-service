@@ -69,9 +69,9 @@ export class IdentifyUsecase {
 
     let allLinked = await this.contactRepo.findAllLinked(primary._id.toString());
 
-    const existsExact = allLinked.some(
-      (c) => c.email === email && c.phoneNumber === phoneNumber
-    );
+     const existsExact = allLinked.some((c) => {
+      return c.email === email && c.phoneNumber === phoneNumber;
+    });
 
     if (!existsExact) {
       await this.contactRepo.create({
